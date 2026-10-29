@@ -1,0 +1,17 @@
+# GitHub Pages builds rustbb.github.io from this, with the docs scripts/site.sh
+# copies next to it. Links between the .md files become links between the
+# pages; heading ids are made as on GitHub.
+title: RustBB
+description: A lightweight bulletin board in one executable
+theme: jekyll-theme-primer
+permalink: pretty
+markdown: kramdown
+kramdown:
+  input: GFM
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+  - jekyll-default-layout
+relative_links:
+  enabled: true
