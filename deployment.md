@@ -2,6 +2,10 @@
 
 RustBB is one executable. It listens on a local port, keeps everything in one SQLite file, and leaves HTTPS to a web server in front of it. [Getting started](getting-started.md) walks through the whole setup; this page has the details.
 
+## What it needs
+
+One CPU and 1 GB of memory is plenty. Every change to RustBB is checked against a budget on a forum of 1,000 members, 2,000 topics and 50,000 posts: at a steady 100 requests a second, with the server on one CPU, 95% of pages are answered within 50 ms, and the server uses under 50 MB of memory. It typically uses under half of both. The database of such a forum is about 20 MB; allow room for backups beside it.
+
 ## systemd
 
 Every Linux archive has a unit, [`deploy/rustbb.service`](https://github.com/rustbb/releases/blob/main/deploy/rustbb.service):
@@ -15,7 +19,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now rustbb
 ```
 
-The service runs as a dynamic user with no login and no home, under `ProtectSystem=strict`. It listens on `127.0.0.1:8080` and keeps the database in `/var/lib/rustbb/rustbb.db`, which systemd creates and owns for it. Migrations run on every start. Logs go to the journal: `journalctl -u rustbb`.
+The service runs as a dynamic user with no login and no home, under `ProtectSystem=strict`. It listens on `127.0.0.1:8080` and keeps the database in `/var/lib/rustbb/rustbb.db`, which systemd creates and owns for it. Migrations run on every start. Logs go to the journal: `journalctl -u rustbb`; [Monitoring](monitoring.md) has JSON logs and metrics.
 
 To run the [command line](command-line.md#on-a-server-with-systemd) on such a server, run it as the service does, so the database files keep their owner.
 

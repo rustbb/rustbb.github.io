@@ -21,7 +21,7 @@ The login widget belongs to a bot, which also sends you a message when someone a
 On the server, download the archive for its architecture and the checksums, and check them:
 
 ```sh
-VERSION=0.3.0
+VERSION=0.4.0
 ARCH=x86_64    # or arm64
 curl -fLO https://github.com/rustbb/releases/releases/download/v$VERSION/rustbb-$VERSION-linux-$ARCH.tar.gz
 curl -fLO https://github.com/rustbb/releases/releases/download/v$VERSION/SHA256SUMS
@@ -45,15 +45,21 @@ Edit `/etc/rustbb/env`. These are the settings to change; [Configuration](config
 
 ```sh
 RUSTBB_BASE_URL=https://forum.example.com
-RUSTBB_SITE_NAME=Example Forum
 RUSTBB_TRUST_PROXY=1
 RUSTBB_TELEGRAM_BOT_TOKEN=123456:ABC...      # from BotFather
 RUSTBB_TELEGRAM_BOT_USERNAME=example_forum_bot
 RUSTBB_ADMIN_TELEGRAM_ID=123456789           # your own id
-RUSTBB_REGISTRATION=INVITE
 ```
 
-Then start it:
+Check the settings. `rustbb check` explains anything that is wrong, and asks Telegram whether the bot token works:
+
+```sh
+sudo systemd-run --pipe --wait --quiet -p DynamicUser=yes -p StateDirectory=rustbb \
+    -p EnvironmentFile=/etc/rustbb/env -E RUSTBB_DATABASE_PATH=/var/lib/rustbb/rustbb.db \
+    /usr/local/bin/rustbb check
+```
+
+Fix every line marked `FAIL`, then start it:
 
 ```sh
 sudo systemctl daemon-reload
@@ -88,7 +94,7 @@ Caddy or Nginx work as well: see [Deployment](deployment.md#a-web-server-in-fron
 
 Open `https://forum.example.com`, choose **Log in** and confirm in Telegram. Because your id is in `RUSTBB_ADMIN_TELEGRAM_ID`, you register without an invitation and become the administrator. Pick your forum username: it is independent of your Telegram username.
 
-Under **Admin → Categories & forums**, create a category and a forum in it. The forum is ready.
+Under **Admin → Settings**, give the forum its name and a short description, and choose who can register: by invitation is the default. Then, under **Admin → Categories & forums**, create a category and a forum in it. The forum is ready.
 
 ## Next
 

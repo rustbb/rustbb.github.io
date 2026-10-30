@@ -22,7 +22,7 @@ Without this setting, create the first invitation on the server with `rustbb inv
 
 ## Registration
 
-`RUSTBB_REGISTRATION` decides who can join. People who already have an account can always sign in.
+The registration mode, set under **Admin → Settings**, decides who can join (`RUSTBB_REGISTRATION` gives a new forum its first mode; see [Configuration](configuration.md#site-settings)). People who already have an account can always sign in.
 
 | Mode | Who can register |
 | --- | --- |

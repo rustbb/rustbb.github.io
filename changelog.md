@@ -6,6 +6,102 @@ rolled back without the backup taken before the upgrade.
 
 A release tag `vX.Y.Z` needs a `## X.Y.Z` section here.
 
+## 0.4.0
+
+Settings in the browser, bans with reasons and address bans, members'
+sessions and data, monitoring, accessibility, and a performance budget.
+
+Database: migrates (a new `settings` table, `deleted_at` and ban details
+for users, the device, address and last use of sessions, and a new
+`ip_bans` table), and adds indexes for counting posts. The database is
+backed up first, as since 0.3.0. After upgrading, the site name and the
+registration mode are set under Admin, Settings: the first start stores
+your `RUSTBB_SITE_NAME` and `RUSTBB_REGISTRATION`, and later changes to
+them are ignored (`rustbb check` says when they differ).
+
+Running a forum:
+
+- `rustbb check` checks the settings, the database and the Telegram bot,
+  and explains each problem: an address that is not https or has a path,
+  a bot token or username that cannot be right, `RUSTBB_TRUST_PROXY` that
+  does not match where RustBB listens, a forum with no way to get an
+  administrator, pending migrations, a database from a newer version, and
+  whether Telegram accepts the token. It changes nothing, and exits with
+  status 1 if anything fails. `--offline` skips asking Telegram.
+- The site name, a new site description and the registration mode are set
+  under Admin, Settings, and take effect at once. They are stored in the
+  database. `RUSTBB_SITE_NAME` and `RUSTBB_REGISTRATION` now only give a
+  forum its first values: the first start of this version stores the ones
+  you have, and after that the variables are ignored (`rustbb check` warns
+  while they differ). The description is shown on the front page and as
+  the pages' meta description.
+- Monitoring. `RUSTBB_LOG_FORMAT=json` writes logs as one JSON object per
+  line, for log collectors. `RUSTBB_METRICS_BIND` (such as
+  `127.0.0.1:9090`) serves Prometheus metrics on an address of its own:
+  requests and their times per route, crashes, memory, the database size,
+  and the number of users, topics, posts and sign-ins. `rustbb check` warns
+  when that address is not a loopback one. A crash while answering a
+  request is now logged with the version and the place in the source, and
+  the visitor gets an error page instead of a closed connection. See the
+  new Monitoring page in the docs.
+- Faster front page on large forums: counting each forum's posts no longer
+  reads every post (new indexes; on 50,000 posts, 23 ms to 8 ms a view).
+  A performance budget now holds every change to 50 ms p95 page time and
+  50 MB of memory at 100 requests a second on one CPU; Deployment in the
+  docs says what a forum needs.
+
+Bans:
+
+- Bans have a reason and may end by themselves: Ban on Admin, Users now
+  opens a form with the reason, how long (a day to a year, or for good),
+  and whether to ban the address the member last used too. A banned
+  member who tries to sign in is told why and until when; when the ban
+  ends they can sign in again. `rustbb user ban <name> --reason ... --days
+  N` does the same.
+- Address bans: Admin, Bans lists banned members and addresses, and bans
+  an address or a range such as `203.0.113.0/24` (up to /16, or /32 for
+  IPv6), for a time or for good. Nobody from a banned address can use the
+  forum. The server's own address, where a web server in front connects
+  from, and the banning administrator's address cannot be banned. On the
+  command line: `rustbb ip list|ban|unban`; a running server applies
+  those within a minute.
+- Sessions now keep the address they started from, shown to the member on
+  their Sessions page, so that administrators can ban it.
+
+Members:
+
+- Settings, Sessions shows members where they are signed in: the browser
+  and system ("Firefox on Linux"), when each session started, was last
+  active and expires. They can end any other session, or all of them but
+  the current one. Sessions from before this version show as "Unknown
+  device". Expired sessions are now removed when the member signs in
+  again.
+- Members can download their data and delete their account, under
+  Settings. The download is a JSON file with their account, Telegram id
+  and username, sign-ins, topics and posts. Deleting signs them out and
+  removes everything that identifies them; their posts stay, shown as by
+  a deleted account, unless they choose to erase them too (topics only
+  they wrote in are then removed). The only administrator cannot delete
+  their account. Operators do the same with `rustbb user export <name>`
+  and `rustbb user delete <name> [--erase-posts]`. SQLite now overwrites
+  deleted data in the database file. The new Privacy page in the docs
+  lists what RustBB stores, for writing a forum's privacy notice.
+- Accessibility. Every page has a "Skip to content" link, one main
+  heading, and labelled navigation (account, breadcrumb, pages) that says
+  where you are. Whatever has keyboard focus gets a clear outline. Every
+  form field has a label, and repeated buttons such as Quote, Edit,
+  Delete and Save say what they act on. In the dark scheme, buttons,
+  "banned" and "locked" tags and error messages now have enough contrast;
+  form field borders and links within text are easier to see; small
+  buttons are at least 24 pixels high. Unknown addresses now get the
+  "Not found" page instead of an empty answer.
+
+For the people who build RustBB:
+
+- Wider tests: every route is tried by a visitor, a member, a moderator,
+  an administrator and a banned member, and a real browser signs in,
+  posts and signs out in CI. Nothing changes for a running forum.
+
 ## 0.3.0
 
 Invitations without codes, automatic backups before upgrades, and
