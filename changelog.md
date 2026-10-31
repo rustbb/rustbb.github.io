@@ -6,6 +6,186 @@ rolled back without the backup taken before the upgrade.
 
 A release tag `vX.Y.Z` needs a `## X.Y.Z` section here.
 
+## 0.5.0
+
+Community essentials: more ways to sign in, bot notifications, search,
+unread tracking, mentions and watched topics, moderation tools, per-forum
+permissions, avatars and images, feeds, English and Russian, and the
+forum's own look.
+
+Database: migrates, with migrations 0009 to 0018 (sign-in methods move
+from the `users` table's Telegram columns to new `identities` and
+`passkeys` tables, and `users` is rebuilt; a `notifications` table,
+notification settings for members and the topics they watch; search
+indexes for topic titles and posts; reading marks per member, forum and
+topic, and each topic's last post; forum moderators, reports, post edit
+history and the moderation log; who may read and post in each forum;
+uploaded images and avatars; each member's language; the forum's logo
+among the uploads). The database is backed up first.
+After upgrading, everything already on the forum counts as read. If you
+pinned `api.telegram.org` to IPv4 in `/etc/hosts` because 0.4.0 could
+not reach Telegram, remove that line (see Running a forum below).
+
+Signing in:
+
+- Besides Telegram, members can sign in with OpenID Connect providers
+  such as Google, Keycloak or Authentik (`RUSTBB_OIDC_<NAME>_ISSUER`,
+  `_CLIENT_ID`, `_CLIENT_SECRET` and an optional `_LABEL`), with GitHub
+  (`RUSTBB_GITHUB_CLIENT_ID` and `_CLIENT_SECRET`), and with passkeys. A
+  forum without Telegram is possible. Sign-in in the docs explains the
+  setup for each provider.
+- One account can have several ways to sign in: Settings, Sign-in lists
+  them, adds Telegram, the providers you set up and passkeys, and removes
+  any but the last. Passkeys need the forum on https:// (or localhost) and
+  are added after signing in another way.
+- `rustbb check` shows the redirect address to register with each
+  provider, and asks each OpenID Connect provider whether it answers.
+- Invitation codes work for every way of signing in; invitations for a
+  Telegram username and invitation requests stay with Telegram accounts.
+  Open registration now reads "anyone who can sign in".
+- `rustbb user list` and Admin, Users show how each member signs in,
+  instead of a Telegram id. A member's data download lists the accounts
+  and passkeys they sign in with, under `sign_in_accounts` and `passkeys`
+  instead of `telegram`.
+
+Notifications:
+
+- Members who sign in with Telegram get a bot message when someone
+  replies to their topics, with the title and a link. Replies that come
+  before the message is sent join it. Members turn them off under
+  Settings, Notifications.
+- Mentions: `@username` in a post links to that member's profile, and
+  the bot tells them (at most ten people per post; not in code or
+  links).
+- Watched topics: the Watch button at the top of a topic, and Settings,
+  Watched topics to list and stop them; the bot tells watchers about new
+  replies. Members can choose to watch every topic they reply to.
+- Each kind (replies, mentions, watched topics) can be turned off under
+  Settings, Notifications; someone who is several at once gets one
+  message.
+- Sending happens in the background and is tried again when Telegram
+  cannot be reached; members who blocked the bot are not tried again. New
+  metrics: `rustbb_notifications_total` and
+  `rustbb_notifications_waiting`. The data download includes them.
+
+Finding things:
+
+- Search: a search box in the header, and a Search page that can keep to
+  one forum. It finds topic titles and posts in which every word appears,
+  as a word or the start of one ("migrat" finds "migration"), and "words
+  in quotes" together; accents do not matter ("cafe" finds "café"), and
+  any script works. Matching titles come first, then posts, with the
+  words marked. A search for a very common word ranks the newest 1,000
+  matches. Built on SQLite's FTS5: on the reference forum of 50,000 posts
+  the index is a quarter of the database, and the upgrade builds it in
+  under a second.
+- Unread tracking: the front page says which forums have new posts, a
+  forum's page marks topics with new posts, and "New" there leads to the
+  first post not yet read; in a topic, posts not seen before are marked
+  New. "Mark forum read" and, on the front page, "Mark all read" clear
+  them. Members' own posts are never new to them, and new members start
+  with everything read. The data download includes what a member has
+  read.
+- Feeds and search engines: Atom and RSS feeds of the newest topics in
+  the forum (`/feed.atom`, `/feed.rss`) and in each forum, and of the
+  newest posts in each topic, which pages link to; a sitemap
+  (`/sitemap.xml`) and `robots.txt`. Pages name their canonical address
+  and carry OpenGraph tags, so shared links show a title, a description
+  and the first image. All of it is what visitors may read: forums for
+  members or staff are left out. See Deployment, Feeds and search engines.
+  The pages' meta description is now the topic's first post or the
+  forum's description where there is one.
+
+Moderation:
+
+- Moderators for some forums only: under Admin, Categories & forums,
+  each forum takes a list of moderator usernames. They moderate those
+  forums (lock, pin, move between their forums, edit and delete posts,
+  delete topics, reports) and are members elsewhere.
+- Who may read and post, for each forum (Admin, Categories & forums):
+  reading for everyone, signed-in members or staff only; posting for
+  members, staff starting topics with members replying (announcements),
+  or staff only (read-only). A staff-only forum is hidden from everyone
+  else everywhere: the front page, its pages, search, profiles and
+  notifications.
+- Reports: members report someone else's post with a reason. Moderators
+  of the forum see "Reports (N)" in the header and the queue, dismiss a
+  report or delete the post, and get a bot message about each new report
+  unless they turn that off under Settings, Notifications.
+- Edit history: an edited post keeps its earlier versions, which its
+  author and the forum's moderators can open.
+- A moderation log of locks, pins, moves, deletions, edits of others'
+  posts, dismissed reports, role and forum moderator changes, and bans.
+  Moderators see it all; forum moderators see their forums'.
+- See Moderation in the docs. The data download includes reports a
+  member made; erasing a member's posts erases their earlier versions.
+
+Avatars and images:
+
+- Members choose an avatar under Settings (cut to a square, 256 pixels),
+  shown with their posts and on their profile.
+- Posts can carry up to four images (PNG, JPEG, GIF or WebP), added when
+  writing or editing and shown under the post. Every image is decoded
+  and encoded again, so the original file's EXIF (where a photo was
+  taken, the camera's serial number) and anything else in it are gone;
+  photos are turned upright first, and images larger than 2,560 pixels
+  are scaled down. A GIF keeps its first frame.
+- Images are served only to those who may read the post. They are kept
+  in `RUSTBB_UPLOADS_PATH` (by default `uploads` next to the database);
+  back that directory up with the database. `RUSTBB_UPLOAD_MAX_MB` (5 by
+  default) limits their size; 0 turns uploads off. `rustbb check` checks
+  the directory. The static Linux binary is about 1.2 MB larger (the
+  `image` crate), about 12 MB in all; its notices list the new libraries.
+
+Languages:
+
+- RustBB speaks English and Russian. The forum's language is set under
+  Admin, Settings, and is what visitors, feeds and members who chose none
+  see; each member can choose their own under Settings, for the pages and
+  the bot's messages to them. Plurals follow each language's rules ("21
+  ответ", "3 ответа", "5 ответов"). Every string a page shows lives in
+  `locales/en.toml` and `locales/ru.toml`; tests check that both have the
+  same keys and placeholders, and that every key used exists. The command
+  line, logs and `rustbb check` stay in English. See Configuration,
+  Languages. The data download includes a member's language.
+
+Look:
+
+- Admin, Settings sets an accent colour (links, buttons, panel headings)
+  and a header colour. An accent too light to read on the page's
+  background (less than 4.5:1) is refused; the tint behind headings and
+  the lighter shade for dark mode are made from it with the same
+  contrast, and the header's text turns white or black to suit.
+- A logo, uploaded there too, takes the site name's place in the header.
+- `RUSTBB_CUSTOM_CSS` adds a stylesheet of your own after RustBB's; it is
+  read at startup, and `rustbb check` shows it. See Configuration, Look.
+  There are no template overrides.
+
+Running a forum:
+
+- The bot reaches Telegram from servers whose IPv6 route to
+  `api.telegram.org` is broken. Outgoing connections (the bot, OpenID
+  Connect providers and GitHub) now try a host's IPv6 and IPv4 addresses
+  side by side, as browsers do, instead of spending most of the time
+  limit on the first one: 0.4.0 timed out there (`rustbb check`:
+  "timeout: global") and could not send bot messages. A line in
+  `/etc/hosts` that pins `api.telegram.org` to IPv4 is no longer needed.
+  When no address answers, the error names each one, IPv6 or IPv4, and
+  what happened.
+- The performance budget's load test now also searches and signs in to
+  the front page.
+- Stability, a new page in the docs, says what stays the same across
+  1.x from 1.0 on: the settings, the commands and their options, upgrades
+  from any release since 0.2.0, the public addresses (forums, topics,
+  posts, profiles, feeds, the sitemap and the sign-in callbacks), the
+  metrics, and the class names and colour variables a custom stylesheet
+  can use. Deprecated settings and commands keep working until 2.0, and
+  fixes go into the newest 1.x release. `cargo test` fails when a release
+  would drop any of them.
+- Command line in the docs lists every command and option.
+- `env.example` now shows the OpenID Connect, GitHub and upload settings
+  too.
+
 ## 0.4.0
 
 Settings in the browser, bans with reasons and address bans, members'

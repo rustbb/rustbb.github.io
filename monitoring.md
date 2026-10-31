@@ -22,7 +22,7 @@ The metrics need no password, so keep the address private: `127.0.0.1` when Prom
 
 ```sh
 docker run -d -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 \
-  -e RUSTBB_METRICS_BIND=0.0.0.0:9090 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.4.0
+  -e RUSTBB_METRICS_BIND=0.0.0.0:9090 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.5.0
 ```
 
 | Metric | Type | Meaning |
@@ -37,6 +37,8 @@ docker run -d -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 \
 | `rustbb_db_size_bytes` | gauge | The database file and its write-ahead log |
 | `rustbb_users`, `rustbb_topics`, `rustbb_posts` | gauge | Accounts, topics and posts that are not deleted |
 | `rustbb_sessions` | gauge | Sign-ins that have not expired |
+| `rustbb_notifications_total` | counter | Tries at sending [bot notifications](telegram.md#notifications), by `outcome`: `sent` or `failed` |
+| `rustbb_notifications_waiting` | gauge | Notifications not yet sent, including ones to be tried again |
 
 A scrape configuration for Prometheus:
 

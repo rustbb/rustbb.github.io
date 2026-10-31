@@ -4,7 +4,7 @@ What RustBB does to protect a forum and its members, and what is left to the ope
 
 ## Accounts and sessions
 
-- There are no passwords and no email addresses to leak. Sign-in goes through Telegram, and RustBB checks Telegram's signature on every login: see [Telegram](telegram.md#how-sign-in-is-checked).
+- There are no passwords to leak. Members sign in with Telegram, whose signature RustBB checks on every login ([Telegram](telegram.md#how-sign-in-is-checked)), with an OpenID Connect provider or GitHub through the authorization code flow with PKCE, or with passkeys: see [Sign-in](sign-in.md#how-sign-in-is-checked).
 - Sessions are rows in the database. The cookie holds only a random token and is `HttpOnly`, `SameSite=Lax`, and `Secure` when `RUSTBB_BASE_URL` is `https://`. Banning a user ends their sessions. Members see where they are signed in under **Settings → Sessions**, and end any of those sessions, or all but the current one.
 - Administrators ban members for a time or for good, with a reason the member is shown, and ban addresses or ranges of addresses: nobody from those can use the forum (Admin → Bans, or [`rustbb user ban` and `rustbb ip ban`](command-line.md)). Bans never apply to the server's own address, where a web server in front connects from, and an administrator cannot ban the address they use.
 - Logins, registrations and posting are rate limited per visitor. Behind a web server, set `RUSTBB_TRUST_PROXY=1` so the limits see visitors' addresses (see [Configuration](configuration.md)).
@@ -18,8 +18,8 @@ What RustBB does to protect a forum and its members, and what is left to the ope
 ## Data
 
 - [Privacy](privacy.md) lists everything RustBB stores about members, and how they download it or delete their account.
-- The request log records paths only, never query strings, so Telegram login data never reaches log files.
-- RustBB sends nothing about the forum or its members to its author. It talks to `api.telegram.org` only to send the bot messages described in [Telegram](telegram.md#requests).
+- The request log records paths only, never query strings, so login data and codes never reach log files.
+- RustBB sends nothing about the forum or its members to its author. It talks to `api.telegram.org` only to send the bot messages described in [Telegram](telegram.md#requests), and to the OpenID Connect providers and GitHub you set up, only while someone signs in.
 
 ## The operator's part
 

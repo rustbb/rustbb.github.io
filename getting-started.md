@@ -6,7 +6,7 @@ You need:
 
 - A Linux server, x86_64 or arm64, with systemd: Debian or Ubuntu here. A small VPS is enough.
 - A domain name whose DNS points at the server (an `A` record, and `AAAA` for IPv6).
-- A Telegram account. Members sign in with Telegram; RustBB has no passwords.
+- A Telegram account. This guide sets up sign-in with Telegram; RustBB has no passwords. Google, GitHub, other OpenID Connect providers and passkeys can be added later: see [Sign-in](sign-in.md).
 
 ## 1. Create the Telegram bot
 
@@ -21,7 +21,7 @@ The login widget belongs to a bot, which also sends you a message when someone a
 On the server, download the archive for its architecture and the checksums, and check them:
 
 ```sh
-VERSION=0.4.0
+VERSION=0.5.0
 ARCH=x86_64    # or arm64
 curl -fLO https://github.com/rustbb/releases/releases/download/v$VERSION/rustbb-$VERSION-linux-$ARCH.tar.gz
 curl -fLO https://github.com/rustbb/releases/releases/download/v$VERSION/SHA256SUMS

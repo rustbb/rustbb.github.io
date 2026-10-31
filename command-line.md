@@ -34,6 +34,34 @@ The commands read the same [settings](configuration.md) as the server and open t
 
 Like the server, every command that opens the database, except `backup` and `migrate --dry-run`, first applies any pending migrations, with the [automatic backup](upgrading.md#the-automatic-backup) before them. `backup` copies the database as it is.
 
+## Commands and options
+
+Every command and option, which stay as they are across 1.x ([Stability](stability.md)). `rustbb --version` and `rustbb help` work everywhere; `--help` after any command explains it.
+
+| Command | Options | What it does |
+| --- | --- | --- |
+| `rustbb serve` | | Applies pending migrations and runs the server; the default |
+| `rustbb check` | `--offline` | Checks the settings, the database and the bot; changes nothing |
+| `rustbb migrate` | `--dry-run` | Backs up the database, applies pending migrations and exits |
+| `rustbb backup <path>` | | Writes a consistent copy of the database, as it is |
+| `rustbb user list` | | Lists the members |
+| `rustbb user role <username> <role>` | | Makes a member a `user`, `moderator` or `admin` |
+| `rustbb user ban <username>` | `--reason`, `--days` | Bans a member and ends their sessions; 0 days, the default, is for good |
+| `rustbb user unban <username>` | | Lifts a member's ban |
+| `rustbb user export <username>` | | Prints everything stored about a member, as JSON |
+| `rustbb user delete <username>` | `--erase-posts` | Deletes an account; `--erase-posts` erases its posts too |
+| `rustbb ip list` | | Lists banned addresses |
+| `rustbb ip ban <address>` | `--reason`, `--days` | Bans an address or a range, such as `203.0.113.0/24` |
+| `rustbb ip unban <address>` | | Lifts the ban on an address or range |
+| `rustbb invite create` | `--uses`, `--days`, `--for` | Creates an invitation code, or an invitation for one Telegram account |
+| `rustbb invite list` | | Lists invitation codes |
+| `rustbb request list` | | Lists requests for an invitation |
+| `rustbb request approve <id>` | | Invites the person who asked; the bot tells them |
+| `rustbb request decline <id>` | | Declines a request |
+| `rustbb licenses` | | Prints the licenses of the components in the binary |
+
+Every command exits with status 0 when it succeeds and 1 when it fails.
+
 ## Checking the setup
 
 `rustbb check` reads the settings like the server, then reports one line per check: `ok`, `warn` or `FAIL`, each with what to do about it.
@@ -49,7 +77,7 @@ FAIL  telegram API  Telegram rejects the token: copy it again from @BotFather (/
 1 problem to fix, 1 warning
 ```
 
-It checks the public address, the bot's token and username, the proxy setting against the listen address, the registration mode and first administrator, and the database: whether it opens, and whether migrations are pending or come from a newer version. It asks Telegram whether the token works and belongs to the named bot; `--offline` skips that. It creates and migrates nothing, and exits with status 1 if anything fails. Run it after changing the settings, and with a new binary before upgrading.
+It checks the public address, the bot's token and username, the proxy setting against the listen address, the registration mode and first administrator, the custom stylesheet, and the database: whether it opens, and whether migrations are pending or come from a newer version. It asks Telegram whether the token works and belongs to the named bot; `--offline` skips that. It creates and migrates nothing, and exits with status 1 if anything fails. Run it after changing the settings, and with a new binary before upgrading.
 
 ## On a server with systemd
 
