@@ -23,6 +23,49 @@ The service runs as a dynamic user with no login and no home, under `ProtectSyst
 
 To run the [command line](command-line.md#on-a-server-with-systemd) on such a server, run it as the service does, so the database files keep their owner.
 
+## Packages
+
+Each of these sets up the same service, with the same unit and settings file; Homebrew, last, is for trying RustBB out:
+
+- **The install script** downloads the archive for the machine and `SHA256SUMS` from the release, refuses an archive that does not match, checks the signature of `SHA256SUMS` too when [cosign](https://docs.sigstore.dev/cosign/system_config/installation/) is installed, and installs as the steps above do. Read it before running it:
+
+  ```sh
+  curl -fsSLO https://rustbb.github.io/install.sh
+  sudo sh install.sh                  # --version 0.5.0 for another release; --help for the rest
+  ```
+
+  It does not start the forum on a new install. Run again, it upgrades: the settings stay, and a running forum restarts. Without root, or on macOS, it installs only the binary, into `~/.local/bin` or `--dir`.
+- **Debian and Ubuntu** (amd64, arm64): the package `rustbb`, from the APT repository at `https://rustbb.github.io/apt`, so upgrades come with `apt upgrade`:
+
+  ```sh
+  sudo install -d -m 0755 /etc/apt/keyrings
+  sudo curl -fsSLo /etc/apt/keyrings/rustbb.gpg https://rustbb.github.io/apt/rustbb.gpg
+  printf 'Types: deb\nURIs: https://rustbb.github.io/apt\nSuites: stable\nComponents: main\nSigned-By: /etc/apt/keyrings/rustbb.gpg\n' |
+    sudo tee /etc/apt/sources.list.d/rustbb.sources
+  sudo apt update && sudo apt install rustbb
+  ```
+
+  The package suggests `xenia-server`, Xenia's package, as the web server in front: with [Xenia's APT repository](https://xenia-platform.github.io/apt/) added too, `sudo apt install rustbb xenia-server` sets up both. Without the repository, each release has the package as a file, covered by its signed `SHA256SUMS`: `sudo apt install ./rustbb_0.6.0_amd64.deb` (or `_arm64`). Installed that way, it upgrades from the repository once that is added.
+- **Fedora and EL9/EL10** (Rocky Linux, AlmaLinux, RHEL; x86_64, aarch64): the package `rustbb`, from the dnf repository at `https://rustbb.github.io/rpm`, so upgrades come with `dnf upgrade`:
+
+  ```sh
+  sudo curl -fsSLo /etc/yum.repos.d/rustbb.repo https://rustbb.github.io/rpm/rustbb.repo
+  sudo dnf install rustbb
+  ```
+
+  dnf checks the signature of each package and of the repository's metadata. Without the repository, each release has the package as a file, covered by `SHA256SUMS`: `sudo dnf install ./rustbb-0.6.0-1.x86_64.rpm` (or `.aarch64`). Those files are not signed themselves; the repository's copies are.
+- **Homebrew** (macOS, and Linux), for trying RustBB out on your own computer: `brew install rustbb/tap/rustbb`, then `brew services start rustbb` runs a forum on `http://127.0.0.1:8080/`. Its settings are in `$(brew --prefix)/etc/rustbb/.env`, its database in `$(brew --prefix)/var/lib/rustbb`; restart it after changing them with `brew services restart rustbb`, and upgrade with `brew upgrade rustbb`. A forum on the internet runs on a Linux server, as above.
+
+Both repositories are signed by RustBB's OpenPGP key, `8A5C 916C 2231 973F 4D69 F84D 675A 145E BCF4 5CC2`: `gpg --show-keys /etc/apt/keyrings/rustbb.gpg` shows it, and dnf shows it before importing it. They keep the last three releases, so `apt install rustbb=VERSION` or `dnf downgrade rustbb` can go back one or two, though not past a release that migrated the database ([Going back](upgrading.md#going-back)).
+
+The packages install the binary as `/usr/bin/rustbb` (the install script and the archive use `/usr/local/bin/rustbb`; with a package, write `/usr/bin/rustbb` in [the command line's alias](command-line.md#on-a-server-with-systemd)), the unit as `/usr/lib/systemd/system/rustbb.service` and the settings as `/etc/rustbb/env`, readable by root only. They do not start the forum either: a new forum takes its name and registration mode from the settings when it first starts, so set it up first, check it, then:
+
+```sh
+sudo systemctl enable --now rustbb
+```
+
+An upgrade keeps edited settings and restarts a running forum, which backs up the database before migrating it ([Upgrading](upgrading.md)). Removing the package leaves the forum's data in `/var/lib/rustbb`; purging a Debian package removes `/etc/rustbb` too, never the data.
+
 ## A web server in front
 
 RustBB speaks plain HTTP on `127.0.0.1`. A web server in front takes the visitors, holds the HTTPS certificate and passes requests on. Behind any of them, set `RUSTBB_TRUST_PROXY=1` and the `https://` address in `RUSTBB_BASE_URL`.

@@ -21,6 +21,14 @@ What RustBB does to protect a forum and its members, and what is left to the ope
 - The request log records paths only, never query strings, so login data and codes never reach log files.
 - RustBB sends nothing about the forum or its members to its author. It talks to `api.telegram.org` only to send the bot messages described in [Telegram](telegram.md#requests), and to the OpenID Connect providers and GitHub you set up, only while someone signs in.
 
+## Reporting a vulnerability
+
+Report it privately, never in a public issue: on the [rustbb/releases](https://github.com/rustbb/releases) repository's **Security** tab, choose **Report a vulnerability**. Its [security policy](https://github.com/rustbb/releases/blob/main/SECURITY.md) says what to include, how soon you hear back, and how fixes are released. A release that fixes a vulnerability says so in the [changelog](changelog.md).
+
+## Reviews
+
+Before 1.0, an external reviewer examines sign-in, sessions, permissions, sanitization, uploads, the admin area and the phpBB importer. When the review is done, this section names who reviewed which version, and what they found and in which release it was fixed.
+
 ## The operator's part
 
 - Serve the forum over HTTPS, with a web server in front: [Deployment](deployment.md#a-web-server-in-front).

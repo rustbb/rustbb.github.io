@@ -21,7 +21,7 @@ The login widget belongs to a bot, which also sends you a message when someone a
 On the server, download the archive for its architecture and the checksums, and check them:
 
 ```sh
-VERSION=0.5.0
+VERSION=0.6.0
 ARCH=x86_64    # or arm64
 curl -fLO https://github.com/rustbb/releases/releases/download/v$VERSION/rustbb-$VERSION-linux-$ARCH.tar.gz
 curl -fLO https://github.com/rustbb/releases/releases/download/v$VERSION/SHA256SUMS
@@ -31,6 +31,8 @@ cd rustbb-$VERSION-linux-$ARCH
 ```
 
 [Upgrading](upgrading.md#checking-a-download) shows how to check the signature of `SHA256SUMS` as well.
+
+The [install script](deployment.md#packages) does this step and the next one's first part in one go: `curl -fsSLO https://rustbb.github.io/install.sh && sudo sh install.sh`. So do the Debian and rpm packages, with the binary in `/usr/bin`. Then go on with editing `/etc/rustbb/env` below.
 
 ## 3. Install it as a service
 

@@ -6,6 +6,60 @@ rolled back without the backup taken before the upgrade.
 
 A release tag `vX.Y.Z` needs a `## X.Y.Z` section here.
 
+## 0.6.0
+
+Moving from phpBB, packages for Debian, Ubuntu, Fedora and Enterprise
+Linux with their own repositories, a Homebrew tap, an install script, and
+a security policy.
+
+Database: migrates, with migration 0019 (claim codes for accounts
+imported from phpBB, and which phpBB numbers they and their images had).
+The database is backed up first.
+
+Moving from phpBB:
+
+- `rustbb import phpbb DUMP` imports a phpBB 3.2 or 3.3 forum from a
+  MySQL or MariaDB dump into a new forum: members with their roles,
+  signatures and bans, categories and forums with who may read and post,
+  forum moderators, topics and posts (BBCode becomes Markdown), and with
+  `--files` attached images and avatars. Forums, topics and posts keep
+  their numbers, and phpBB's links (`viewtopic.php`, `viewforum.php`,
+  `memberlist.php`, `download/file.php`) redirect to them. Names that are
+  not Latin letters are transliterated. `--dry-run` checks everything and
+  changes nothing. Passwords, email and IP addresses are not read.
+- Imported members claim their accounts with a code from Admin, Users or
+  `rustbb user claim`, entered on the registration page after signing in
+  with Telegram or another provider, even while registration is closed.
+- Moving from phpBB in the docs explains it.
+
+Security:
+
+- Vulnerabilities are reported privately through GitHub's private
+  vulnerability reporting on rustbb/releases, whose new security policy
+  (`SECURITY.md`) says what happens next. Security in the docs says so,
+  and will list the external review's findings and fixes.
+
+Installing:
+
+- Debian and Ubuntu packages (`rustbb_VERSION_amd64.deb`, `_arm64`) and
+  rpms for Fedora and EL9/EL10 (`x86_64`, `aarch64`) come with each
+  release. They install the binary as `/usr/bin/rustbb`, the systemd
+  unit and `/etc/rustbb/env`, and do not start the forum until it is set
+  up; an upgrade keeps the settings and restarts a running forum. The
+  Debian package suggests `xenia-server`.
+- `https://rustbb.github.io/install.sh` installs a release on Linux as a
+  systemd service, or the binary alone on macOS or without root, after
+  checking the archive against `SHA256SUMS` (and its signature, when
+  cosign is installed). Run again, it upgrades.
+- APT and dnf repositories, `https://rustbb.github.io/apt` and
+  `https://rustbb.github.io/rpm`, signed by RustBB's key
+  `8A5C 916C 2231 973F 4D69 F84D 675A 145E BCF4 5CC2`, so `apt upgrade`
+  and `dnf upgrade` bring new releases. Deployment, Packages says how to
+  add them.
+- Homebrew, for trying RustBB out on macOS or Linux:
+  `brew install rustbb/tap/rustbb`, then `brew services start rustbb`.
+- Deployment in the docs has a Packages section.
+
 ## 0.5.0
 
 Community essentials: more ways to sign in, bot notifications, search,

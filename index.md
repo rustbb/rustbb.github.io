@@ -1,6 +1,6 @@
 # RustBB
 
-A classic bulletin board in one executable, with SQLite built in. Version 0.5.0.
+A classic bulletin board in one executable, with SQLite built in. Version 0.6.0.
 
 - **Categories, forums, topics and posts**, with Markdown that is sanitized on output, search across them, and what is new since a member last looked.
 - **Easy to follow and to find:** Atom and RSS feeds for the forum, each forum and each topic, a sitemap, canonical addresses, and link previews in chats and social networks.
@@ -22,7 +22,7 @@ Archives for Linux (static, x86_64 and arm64), macOS and Windows are in [the rel
 The [Docker image](docker.md), for amd64 and arm64:
 
 ```sh
-docker run -d -p 8080:8080 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.5.0
+docker run -d -p 8080:8080 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.6.0
 ```
 
 ## Documentation
@@ -36,6 +36,7 @@ docker run -d -p 8080:8080 -v rustbb:/var/lib/rustbb --env-file env ofkindness/r
 - [Command line](command-line.md): users, invitations, requests and backups.
 - [Monitoring](monitoring.md): logs, Prometheus metrics and crashes.
 - [Upgrading](upgrading.md): backups, migrations and checking a download.
+- [Moving from phpBB](importing.md): importing a phpBB forum, its members and their posts.
 - [Stability](stability.md): what stays the same across 1.x, and how deprecations and fixes work.
 - [Moderation](moderation.md): moderators, who may read and post in each forum, reports, edit history and the moderation log.
 - [Privacy](privacy.md): what RustBB stores, data exports and deleting accounts.

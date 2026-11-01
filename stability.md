@@ -59,6 +59,7 @@ These addresses keep working, for links, bookmarks, feed readers, search engines
 | `/auth/telegram/callback` | Where the Telegram login returns |
 | `/auth/oauth/{key}/callback` | The redirect address registered with an OpenID Connect provider or GitHub ([Sign-in](sign-in.md#sign-in)) |
 | `/static/style.css` | RustBB's stylesheet |
+| `/index.php`, `/viewforum.php`, `/viewtopic.php`, `/memberlist.php`, `/download/file.php` | phpBB's addresses, which redirect to the same forum, topic, post, member or image on a forum [imported from phpBB](importing.md#old-links) |
 
 Lists of forums, topics and search results take the page number in `page`, such as `/f/2?page=3`.
 

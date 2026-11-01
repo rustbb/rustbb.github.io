@@ -14,6 +14,7 @@ rustbb user ban <name> --reason "Spam" --days 7   # 0 days, the default, is for 
 rustbb user unban <name>
 rustbb user export <name>            # everything stored about them, as JSON
 rustbb user delete <name>            # delete the account; --erase-posts erases their posts too
+rustbb user claim <name>             # a code to claim an account imported from phpBB
 rustbb ip list                       # banned addresses
 rustbb ip ban 203.0.113.0/24 --reason "Spam" --days 30
 rustbb ip unban 203.0.113.0/24
@@ -25,6 +26,7 @@ rustbb request list                  # people who asked for an invitation
 rustbb request approve <id>          # invites them; the bot tells them
 rustbb request decline <id>
 rustbb backup /path/to/copy.db       # a consistent copy while the forum runs, as it is
+rustbb import phpbb phpbb.sql --files /var/www/phpbb   # a phpBB forum, into a new one
 rustbb licenses                      # licenses of the components in the binary
 rustbb --version                     # version, commit and build date
 rustbb help <command>
@@ -50,6 +52,7 @@ Every command and option, which stay as they are across 1.x ([Stability](stabili
 | `rustbb user unban <username>` | | Lifts a member's ban |
 | `rustbb user export <username>` | | Prints everything stored about a member, as JSON |
 | `rustbb user delete <username>` | `--erase-posts` | Deletes an account; `--erase-posts` erases its posts too |
+| `rustbb user claim <username>` | | Makes a code with which the owner of an [imported](importing.md) account claims it |
 | `rustbb ip list` | | Lists banned addresses |
 | `rustbb ip ban <address>` | `--reason`, `--days` | Bans an address or a range, such as `203.0.113.0/24` |
 | `rustbb ip unban <address>` | | Lifts the ban on an address or range |
@@ -58,6 +61,7 @@ Every command and option, which stay as they are across 1.x ([Stability](stabili
 | `rustbb request list` | | Lists requests for an invitation |
 | `rustbb request approve <id>` | | Invites the person who asked; the bot tells them |
 | `rustbb request decline <id>` | | Declines a request |
+| `rustbb import phpbb <dump>` | `--prefix`, `--files`, `--dry-run` | Imports a phpBB forum into a new one: [Moving from phpBB](importing.md) |
 | `rustbb licenses` | | Prints the licenses of the components in the binary |
 
 Every command exits with status 0 when it succeeds and 1 when it fails.

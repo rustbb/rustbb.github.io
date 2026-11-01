@@ -22,7 +22,7 @@ The metrics need no password, so keep the address private: `127.0.0.1` when Prom
 
 ```sh
 docker run -d -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 \
-  -e RUSTBB_METRICS_BIND=0.0.0.0:9090 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.5.0
+  -e RUSTBB_METRICS_BIND=0.0.0.0:9090 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.6.0
 ```
 
 | Metric | Type | Meaning |

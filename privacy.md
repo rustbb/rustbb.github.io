@@ -42,6 +42,17 @@ RustBB never receives a password. It receives an email address only from an Open
 
 A declined request is kept so that the same Telegram account cannot ask again.
 
+### Members of a forum imported from phpBB
+
+[`rustbb import phpbb`](importing.md) carries over from phpBB, for each member: the username (in Latin letters, with the original in their "About me"), the signature (as "About me"), the role, a ban in force with its reason, when they registered and last visited, an uploaded avatar, their topics and posts with their times and edits, and attached images. It does not read passwords, email addresses, IP addresses, private messages or anything else. These are stored as in the table above, and the member gets a copy or deletes them the same way once they have claimed the account.
+
+| Data | Why | Kept until |
+| --- | --- | --- |
+| A claim code for an imported account: who made it, when, and when it expires | The member taking over the account | It is used, replaced by a new one, or the account is deleted; an expired one stays until then, unusable |
+| Which phpBB member number and attachment number became which account and image | Redirecting phpBB's old links | Kept with the forum's records |
+
+Posts by phpBB's guests keep the name the guest gave, and belong to an account called `guest`.
+
 ### Banned addresses
 
 Administrators can ban an address or a range of addresses (Admin → Bans, or `rustbb ip ban`). The address, the reason, who banned it and when the ban ends are kept until the ban is lifted or ends. Nobody from a banned address can use the forum.
