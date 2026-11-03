@@ -101,6 +101,20 @@ alias rustbb='sudo systemd-run --pipe --wait --quiet -p DynamicUser=yes -p State
 
 A backup written this way lands where the service user may write, such as `/var/lib/rustbb/`.
 
+## On FreeBSD
+
+The [package](deployment.md#freebsd)'s service runs as the user `rustbb`, with the settings in `/usr/local/etc/rustbb/env`, which only root reads. As root, run commands the same way, so the database files keep their owner; a shell function saves typing:
+
+```sh
+rustbb() {
+    sh -c 'set -a; . /usr/local/etc/rustbb/env; : "${RUSTBB_DATABASE_PATH:=/var/db/rustbb/rustbb.db}"
+        exec chroot -u rustbb -g rustbb / /usr/local/bin/rustbb "$@"' rustbb "$@"
+}
+rustbb user list
+```
+
+A backup written this way lands where `rustbb` may write, such as `/var/db/rustbb/`.
+
 ## In Docker
 
 ```sh

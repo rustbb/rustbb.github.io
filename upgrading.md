@@ -10,7 +10,7 @@ An upgrade replaces the binary or the image; the database stays where it is. Mig
 
 ## The automatic backup
 
-When a new version finds migrations to apply, it first writes a copy of the database next to it, named after the version and the time, such as `rustbb-before-0.6.0-20261102T120000Z.db` in `/var/lib/rustbb/`. If the copy cannot be written, nothing is migrated and the forum does not start. The log says where the copy went.
+When a new version finds migrations to apply, it first writes a copy of the database next to it, named after the version and the time, such as `rustbb-before-0.7.0-20261103T120000Z.db` in `/var/lib/rustbb/`. If the copy cannot be written, nothing is migrated and the forum does not start. The log says where the copy went.
 
 These copies are not removed by RustBB. Keep the newest until the new version has run for a while, and delete older ones when you no longer need them. Your own regular backups ([Deployment](deployment.md#backups)) are separate.
 
@@ -24,7 +24,7 @@ sudo systemctl restart rustbb
 journalctl -u rustbb -n 20    # the first line names the new version
 ```
 
-With the [install script](deployment.md#packages), run it again instead; with a package, install the new one (`sudo apt install ./rustbb_….deb`, `sudo dnf install ./rustbb-….rpm`). Both restart a running forum.
+With the [install script](deployment.md#packages), run it again instead; with a package, install the new one (`sudo apt install ./rustbb_….deb`, `sudo dnf install ./rustbb-….rpm`, on FreeBSD `pkg upgrade` from the pkg repository or `pkg add ./rustbb-….pkg`). Each restarts a running forum, except on FreeBSD: there, run `service rustbb restart` after it.
 
 Releases can be skipped: a new version applies every migration since yours, after one backup. From 1.0, settings, commands and addresses stay as they are across 1.x, so an upgrade within 1.x needs no changes to the setup ([Stability](stability.md)).
 
@@ -33,7 +33,7 @@ If you pinned `api.telegram.org` to an IPv4 address in `/etc/hosts` because 0.4 
 ## With Docker
 
 ```sh
-docker pull ofkindness/rustbb:0.6.0
+docker pull ofkindness/rustbb:0.7.0
 docker rm -f rustbb
 docker run -d --name rustbb ...    # as before, with the new tag
 ```
@@ -58,7 +58,7 @@ sha256sum -c --ignore-missing SHA256SUMS    # shasum -a 256 -c on macOS
 The image is signed the same way, and carries its software bill of materials (CycloneDX) as a signed attestation:
 
 ```sh
-cosign verify ofkindness/rustbb:0.6.0 \
+cosign verify ofkindness/rustbb:0.7.0 \
     --certificate-identity https://github.com/rustbb/rustbb/.github/workflows/publish.yml@refs/heads/main \
     --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```

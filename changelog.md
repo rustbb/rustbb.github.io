@@ -6,6 +6,91 @@ rolled back without the backup taken before the upgrade.
 
 A release tag `vX.Y.Z` needs a `## X.Y.Z` section here.
 
+## 0.7.0
+
+FreeBSD packages and a pkg repository, reactions on posts, polls in
+topics, and private messages between members.
+
+Database: migrates, with migrations 0020 (a `reactions` table: who left
+which reaction on which post), 0021 (`polls`, `poll_options` and
+`poll_votes`) and 0022 (`conversations`, `conversation_members`,
+`messages`, `blocks` and `message_reports`; two member settings; and
+`notifications` copied into a table whose rows may be about a private
+message instead of a post).
+
+Reactions:
+
+- Members react to posts with 👍 ❤️ 😂 😮 😢 👎, each once, and take a
+  reaction back by pressing it again. Anyone who may read the forum may,
+  also in locked topics and where they may not reply, but not to their
+  own posts. Without JavaScript the buttons are a form; with it the page
+  stays where it is.
+- Visitors see the counts. Members also see who reacted, in each button's
+  description and on the post's **Who reacted** page, where the forum's
+  moderators can remove a reaction; the moderation log records it.
+- A member's data export lists their reactions. Deleting an account
+  removes them, and `--erase-posts` also removes the reactions to the
+  posts it erases. Reactions send no bot notifications.
+
+Polls:
+
+- Whoever starts a topic can add a poll: 2 to 10 options, one choice or
+  up to a number, open for a number of days or until closed. Moderators
+  can add one to a topic later. The forum's list marks topics with a
+  poll.
+- Members who may reply vote, and can change or withdraw their vote until
+  the poll closes; locked topics take no votes. Votes are anonymous, and
+  the counts show after voting, to those who cannot vote, and to
+  everyone once the poll closes.
+- Until the first vote its author and moderators can change or delete
+  it; afterwards they can close it, and moderators delete it. The
+  moderation log records moderators' changes to other members' polls.
+- The data export lists the member's polls and votes. Deleting an account
+  keeps its votes, for the deleted account; `--erase-posts` also removes
+  its polls.
+
+Private messages:
+
+- Members write to each other in private conversations, one for each
+  pair: from a profile's **Send a message**, or **Messages** in the
+  header, which counts conversations with unread messages. Markdown as
+  in posts, no images.
+- Starting a conversation takes a first post and is limited to five an
+  hour (moderators, forum moderators and administrators aside). Messages cannot be edited
+  or deleted; each member can remove a conversation from their list,
+  and it is deleted once both have.
+- Members block others, or turn private messages off under Settings; a
+  blocked member is told only that the other does not take their
+  messages.
+- The bot tells members about new messages, saying who wrote but not
+  what; Settings, Notifications turns it off.
+- Nobody else reads conversations. A member can report a message; the
+  report queue of moderators everywhere and administrators shows it with
+  up to five messages before it, and the bot tells them.
+- The data export lists the messages a member sent and whom they
+  blocked. Deleting an account keeps its messages for the other member;
+  `--erase-posts` also erases their text.
+
+Installing:
+
+- FreeBSD 14 and 15, amd64 and arm64: each release has a FreeBSD archive
+  and the package `rustbb`, which adds the user `rustbb` and the rc.d
+  service, with its settings in `/usr/local/etc/rustbb/env` and the
+  database in `/var/db/rustbb`. It does not start the forum on a new
+  install, and on an upgrade a running forum goes on until
+  `service rustbb restart`. Deployment, FreeBSD in
+  the docs explains it. The install script points FreeBSD to the package.
+- A pkg repository for FreeBSD, `https://rustbb.github.io/pkg`, signed by
+  RustBB's RSA key `rustbb.pub` (SHA-256 `ff1acecac4db6aa020212bb93e3b540f`
+  `e52b4a12bd6cb5ead18854375004b567`), so `pkg upgrade` brings new releases. Deployment,
+  FreeBSD says how to add it.
+
+Security:
+
+- pulldown-cmark, which renders posts, is updated to 0.13.6 for
+  RUSTSEC-2026-0433 (slow parsing of nested image wikilinks). RustBB does
+  not turn wikilinks on, so forums were not exposed to it.
+
 ## 0.6.0
 
 Moving from phpBB, packages for Debian, Ubuntu, Fedora and Enterprise

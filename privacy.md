@@ -23,6 +23,12 @@ Everything is in the one SQLite database (`RUSTBB_DATABASE_PATH`), and in the ba
 | Their avatar, and images they attach to posts: the image only, decoded and encoded again, so the original file's EXIF (where a photo was taken, the camera and its serial number), comments and anything else in it are gone; its size and when it was added | The member | Showing them | They remove the avatar or the image (editing the post), or the post is erased; the avatar goes with the account |
 | A search index of topic titles and post text | Built from the topics and posts | Search | With the text it indexes: an edited post is indexed again, an erased one leaves the index |
 | The earlier versions of their edited posts, who wrote each and when | The member, or a moderator who edited the post | Edit history, for the author and the forum's moderators | With the post; erasing their posts erases these too |
+| Reactions they left: the post, which reaction, and when | The member, with the buttons under a post | Shown under the post: how many to everyone who may read it, the names to signed-in members | They take it back, a moderator removes it, the post goes (erasing someone's posts removes the reactions to them), or the account is deleted |
+| Polls they made: the question, its options, how many choices each member has, when it was made, closes or was closed | The member, when starting a topic (or a moderator, later) | Shown above the topic's posts | Deleted by its author before anyone votes or by a moderator, with the topic, or when their posts are erased |
+| Their votes in polls: which options, and when | The member | Counting the votes; changing or withdrawing a vote. Nobody sees who voted for what, only how many | They withdraw it, the poll goes, or with the topic. Deleting the account keeps the votes, counted for the deleted account and no longer linked to the person |
+| Private messages they send: the text, to whom, and when; for each conversation, up to which message they have read and whether they removed it from their list | The member | Delivering them to the other member, who alone reads them besides the sender; moderators everywhere and administrators see a message one of the two reports, with up to five before it | Removed once both members removed the conversation (unless a report of it is open). Deleting the account keeps them for the other member, shown as from "deleted account"; erasing their posts also erases the text of their messages |
+| Whether they take private messages, and the members they blocked | The member, under Settings and on profiles | Refusing messages they do not want | They change it, unblock, or the account is deleted |
+| Reports of private messages they made: the message, the reason, when, and the outcome | The member | The report queue of moderators everywhere and administrators | Deleting the account removes them; otherwise kept with the forum's records |
 | Reports they made: the post, the reason, when, and the outcome | The member | The report queue; moderators see who reported | Deleting the account removes them; otherwise kept with the forum's records |
 | The moderation log: what moderators and administrators did, to which topic, post or member, and a reason where there is one | The forum | Moderators checking each other's work | Kept with the forum's records; a deleted account in it shows as "deleted account" |
 | Which forums a member moderates | Administrators | Moderation | Changed by an administrator, or the account is deleted |
@@ -68,7 +74,7 @@ Administrators can ban an address or a range of addresses (Admin → Bans, or `r
 
 ## A copy of one's data
 
-Signed-in members download everything above about themselves under **Settings → Your data**, as a JSON file: their account, avatar and attached images, the accounts and passkeys they sign in with, sessions, notifications, watched topics, reports they made, what they have read, topics, posts (including ones a moderator deleted), the invitations they created and their invitation request.
+Signed-in members download everything above about themselves under **Settings → Your data**, as a JSON file: their account, avatar and attached images, the accounts and passkeys they sign in with, sessions, notifications, watched topics, reactions they left, polls they made and their votes, the private messages they sent (those sent to them belong to the other member and are not in it), the members they blocked, reports they made, what they have read, topics, posts (including ones a moderator deleted), the invitations they created and their invitation request.
 
 For someone who cannot sign in, such as a banned member, the operator makes the same file on the server:
 
@@ -88,11 +94,14 @@ rustbb user delete alice --erase-posts   # their posts' text is erased too
 Deleting an account at once:
 
 - ends all its sessions;
-- removes every account and passkey it signed in with, its avatar, its notifications, watched topics, reports, forum moderation and reading marks, the "About me" text, the chosen language and the sign-in times, and replaces the username with `deleted-<number>`, shown as "deleted account";
+- removes every account and passkey it signed in with, its avatar, its notifications, watched topics, reactions, reports, forum moderation and reading marks, the "About me" text, the chosen language and the sign-in times, and replaces the username with `deleted-<number>`, shown as "deleted account";
 - removes their invitation request and any invitation meant for them;
+- removes their blocks, and others' blocks of them, and their reports of private messages;
+- keeps their private messages for the other member, shown as from "deleted account", who can no longer write back;
+- keeps their votes in polls, so that the counts stay right: they are counted for the deleted account, which nothing links to the person any more;
 - frees the username, and lets the same Telegram or other account register again as a new member.
 
-Their posts stay, shown as by a deleted account, so that discussions still make sense. With **Also erase all my posts** (or `--erase-posts`), the text and images of every post they wrote are erased, and topics in which nobody else wrote are removed. The titles of topics they started that others replied to stay; a moderator can remove those.
+Their posts stay, shown as by a deleted account, so that discussions still make sense. With **Also erase all my posts** (or `--erase-posts`), the text and images of every post they wrote are erased, with the reactions to them, the polls they made (and the votes in those) and the text of their private messages, and topics in which nobody else wrote are removed. The titles of topics they started that others replied to stay; a moderator can remove those.
 
 The only administrator cannot delete their account: another member must be made administrator first.
 

@@ -1,6 +1,6 @@
 # RustBB
 
-A classic bulletin board in one executable, with SQLite built in. Version 0.6.0.
+A classic bulletin board in one executable, with SQLite built in. Version 0.7.0.
 
 - **Categories, forums, topics and posts**, with Markdown that is sanitized on output, search across them, and what is new since a member last looked.
 - **Easy to follow and to find:** Atom and RSS feeds for the forum, each forum and each topic, a sitemap, canonical addresses, and link previews in chats and social networks.
@@ -22,7 +22,7 @@ Archives for Linux (static, x86_64 and arm64), macOS and Windows are in [the rel
 The [Docker image](docker.md), for amd64 and arm64:
 
 ```sh
-docker run -d -p 8080:8080 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.6.0
+docker run -d -p 8080:8080 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.7.0
 ```
 
 ## Documentation

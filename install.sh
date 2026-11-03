@@ -68,6 +68,7 @@ fi
 case $(uname -s) in
 Linux) os=linux ;;
 Darwin) os=macos ;;
+FreeBSD) die "on FreeBSD, install the package instead: https://rustbb.github.io/deployment/#freebsd" ;;
 *) die "no RustBB archive for $(uname -s); Windows has a .zip in $repo/releases" ;;
 esac
 case $(uname -m) in

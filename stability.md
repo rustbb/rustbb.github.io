@@ -101,6 +101,20 @@ A custom stylesheet may use these classes. Each keeps its meaning across 1.x.
 | `content` | A post's text and its tools, beside the author |
 | `tools` | A post's buttons and links |
 | `attachments` | The images attached to a post |
+| `reactions` | The reactions under a post |
+| `reaction` | One reaction: a count, or a button to leave or take it back |
+| `react` | The full choice of reactions behind the "React" button |
+| `poll` | A topic's poll, above its posts |
+| `poll-results` | A poll's counts, one option a row |
+| `option` | An option's text in a poll's counts |
+| `count` | An option's votes and share in a poll's counts |
+| `poll-change` | The "Change my vote" choice, once a member has voted |
+| `poll-form` | The poll's fields on the New topic form |
+| `messages` | The messages of a private conversation |
+| `message` | One private message |
+| `mine` | A private message the member wrote |
+| `reported` | The reported private message in the report queue |
+| `report-message` | The "Report" choice on a private message |
 | `deleted` | A deleted post |
 | `revision` | One version in a post's edit history |
 | `snippet` | A search result's excerpt |
