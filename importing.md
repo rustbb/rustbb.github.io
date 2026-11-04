@@ -1,6 +1,6 @@
 # Moving from phpBB
 
-`rustbb import phpbb` brings a phpBB 3.2 or 3.3 forum into a new RustBB forum: its members, categories and forums, topics, posts and attached images. Forums, topics and posts keep their numbers, so phpBB's old links lead to the same pages. Members get their accounts back with a claim code, because RustBB has no passwords.
+`rustbb import phpbb` brings a phpBB 3.2 or 3.3 forum into a new RustBB forum: its members, categories and forums, topics, posts, polls and attached images, and if you ask for them, private messages. Forums, topics and posts keep their numbers, so phpBB's old links lead to the same pages. Members get their accounts back with a claim code, because RustBB has no passwords.
 
 ## What comes over
 
@@ -19,10 +19,16 @@
 | Soft-deleted posts | Deleted posts, which moderators still see |
 | Posts by guests and by deleted members | Posts by one account called `guest`, each starting with the name the guest gave |
 | Attached images (JPEG, PNG, GIF, WebP) | Images attached to the posts |
+| Polls | [Polls](moderation.md#polls) with their options in the same order, how many each member may choose, and their end. Members' votes come over; votes by guests and by accounts left out do not, so counts can be lower than phpBB showed. Votes stay anonymous. A poll keeps more than ten options, or an end further away than 90 days, if it had them. |
+| Private messages, only with `--messages` | [Conversations](moderation.md#private-messages), one for each pair of members. A message to several members is in the sender's conversation with each of them. It comes over for every member who still had it in phpBB, and for everyone it went to while its sender still had it. A subject starts the message in bold, unless it only replies to the one before ("Re: …"). Messages to or from accounts left out stay behind. |
+| Foes | Blocks: neither can write to the other, as in phpBB |
+| "Allow users to send you private messages" turned off | Private messages turned off under **Settings → Private messages** |
 
-Left out: passwords and email addresses, IP addresses, private messages, polls, attachments that are not images, unapproved topics and posts, inactive accounts that never posted, bots, ranks, groups other than the two above, permissions given to single members, and bans of addresses and email addresses ([ban addresses](command-line.md#commands-and-options) again with `rustbb ip ban`). phpBB 3.0 and 3.1 stored posts differently: their posts come over as plain text, without formatting.
+Left out: passwords and email addresses, IP addresses, private messages unless `--messages` asks for them, drafts, friends, attachments that are not images, unapproved topics and posts, inactive accounts that never posted, bots, ranks, groups other than the two above, permissions given to single members, and bans of addresses and email addresses ([ban addresses](command-line.md#commands-and-options) again with `rustbb ip ban`). phpBB 3.0 and 3.1 stored posts differently: their posts come over as plain text, without formatting.
 
-Everything imported counts as read, for everyone.
+Everything imported counts as read, for everyone, private messages too.
+
+Private messages are what members wrote to each other in confidence. Bring them over only if you have told the members you will, the way you tell them about the move; without `--messages` they stay in phpBB's dump.
 
 ## 1. Export phpBB
 
@@ -43,13 +49,16 @@ Import into a forum that has no forums or topics yet: a new one, before you set 
 A dry run reads and checks everything, then changes nothing:
 
 ```sh
-rustbb import phpbb phpbb.sql --files /path/to/phpbb --dry-run
+rustbb import phpbb phpbb.sql --files /path/to/phpbb --messages --dry-run
 ```
 
 ```text
 412 members (37 renamed; 1890 inactive accounts that never posted left out)
 3 categories and 14 forums (2 not open to visitors)
 5210 topics and 61873 posts (204 more deleted)
+38 polls with 1204 votes (57 by guests or members left out)
+8812 private messages in 1630 conversations (95 to or from members left out)
+21 foes, now blocked
 2318 attached images and 96 avatars (41 files left out)
 dry run: nothing was changed
 ```

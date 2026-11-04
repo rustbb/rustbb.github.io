@@ -58,7 +58,7 @@ Whoever starts a topic can add a poll to it on the New topic form, under **Add a
 
 Members who may reply in the forum vote, the poll's author too; voting stops when the topic is locked, and in forums where members may not reply. They can change or withdraw their vote until the poll closes. Votes are anonymous: everyone, moderators too, sees only how many chose each option, and only after voting, when they cannot vote, or once the poll has closed. Visitors see the counts once it closes.
 
-Until someone votes, the poll's author and the forum's moderators can change it, or delete it. After that it stays as it is: its author and the moderators can close it early, and only moderators can delete it. The log records what moderators do to other members' polls.
+Until someone votes, the poll's author and the forum's moderators can change it, or delete it; its author only while the topic is not locked, as with their posts, and they cannot delete a topic whose poll has others' votes. After that it stays as it is: its author (in a topic that is not locked) and the moderators can close it early, and only moderators can delete it. The log records what moderators do to other members' polls.
 
 ## Private messages
 

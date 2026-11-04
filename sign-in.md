@@ -72,7 +72,7 @@ RustBB asks GitHub for no scopes: it reads only the account's public id, login a
 
 Passkeys need nothing in the settings, but browsers allow them only on `https://` addresses (and on `localhost`), and the forum must have a domain name rather than an IP address. A passkey belongs to the domain in `RUSTBB_BASE_URL`: moving the forum to another domain leaves members' passkeys behind, so they need another way to sign in then.
 
-A member adds a passkey under **Settings → Sign-in** after signing in another way. The device, a password manager or a security key keeps it; signing in then takes the device's screen lock, fingerprint or face. Registering with a passkey alone is not possible: a new member registers with one of the other methods first.
+A member adds a passkey under **Settings → Sign-in** after signing in another way. The device, a password manager or a security key keeps it; signing in then takes what the device asks for: its screen lock, fingerprint or face, or for a security key without a PIN, a touch. Registering with a passkey alone is not possible: a new member registers with one of the other methods first.
 
 ## The first administrator
 
@@ -82,5 +82,5 @@ A member adds a passkey under **Settings → Sign-in** after signing in another 
 
 - **OpenID Connect and GitHub** use the authorization code flow with PKCE. The `state` sent to the provider is also kept in a cookie, so the answer is accepted only in the browser that asked, once, within ten minutes. The code is exchanged at the provider's token endpoint with the client secret. The ID token comes from that exchange, directly from the provider over HTTPS, so its signature is not checked separately; its issuer, audience, expiry and nonce are. The provider's addresses must be `https://`.
 - **Passkeys** are checked with [ring](https://github.com/briansmith/ring): the signature over the authenticator's data and the challenge, the forum's origin and domain, and a use count that only goes up, which reveals a copied key. RustBB stores each passkey's public key, never anything secret.
-- **Adding a method** started from Settings joins the account at once. A Telegram login that arrives while someone is signed in asks first, because anyone can send a browser to the Telegram callback.
+- **Adding a method** with its button under **Settings → Sign-in** joins the account at once. An account that arrives any other way while someone is signed in, by a link to a provider or a Telegram login, is added only after they confirm, because any site can send a browser there.
 - Logs never record query strings, so the codes and login payloads in callback addresses stay out of log files.

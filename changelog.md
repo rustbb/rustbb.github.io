@@ -6,6 +6,45 @@ rolled back without the backup taken before the upgrade.
 
 A release tag `vX.Y.Z` needs a `## X.Y.Z` section here.
 
+## 0.7.1
+
+Fixes security issues found by an internal review of 0.7.0: upgrade.
+[Security](security.md#reviews) lists them. The phpBB importer also
+brings polls, foes and, if asked, private messages over. No database
+migration.
+
+Security:
+
+- A Telegram login works once, whatever it leads to, and only in the
+  browser the forum just showed the widget to. Before, a copy of the
+  login address could register the Telegram account as someone else's,
+  or sign in as its owner once they had registered.
+- An uploaded image's memory is checked before it is decoded. Before, a
+  few bytes could take about a gigabyte.
+- An account at a provider is added at once only from its button under
+  **Settings → Sign-in**, now a form; a link from elsewhere asks first.
+- Rate limits, and banning a member's last address, count an IPv6
+  visitor by their /64.
+- The moderation log and a member's data no longer name staff-only
+  forums their reader may not read, and messages about reports go only to
+  those who still moderate.
+- A poll's author can no longer change, close or delete it in a locked
+  topic, nor delete their topic along with others' votes in its poll.
+- Passkey use counts, Telegram fields with line breaks and repeated
+  `X-Forwarded-For` lines are handled more strictly.
+- Passkeys: the docs no longer promise that signing in always takes the
+  device's PIN or fingerprint; a security key without a PIN takes a touch.
+
+Importing phpBB:
+
+- `rustbb import phpbb` brings polls over, with their members' votes
+  (votes by guests and by accounts left out stay behind), and phpBB's
+  foes as blocks. Members who turned private messages off in phpBB keep
+  them off.
+- With `--messages`, private messages come over too, into a conversation
+  for each pair of members, all of them read. Without it they stay
+  behind, as before.
+
 ## 0.7.0
 
 FreeBSD packages and a pkg repository, reactions on posts, polls in

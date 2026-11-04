@@ -21,7 +21,7 @@ The login widget belongs to a bot, which also sends you a message when someone a
 On the server, download the archive for its architecture and the checksums, and check them:
 
 ```sh
-VERSION=0.7.0
+VERSION=0.7.1
 ARCH=x86_64    # or arm64
 curl -fLO https://github.com/rustbb/releases/releases/download/v$VERSION/rustbb-$VERSION-linux-$ARCH.tar.gz
 curl -fLO https://github.com/rustbb/releases/releases/download/v$VERSION/SHA256SUMS

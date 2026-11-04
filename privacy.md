@@ -50,7 +50,7 @@ A declined request is kept so that the same Telegram account cannot ask again.
 
 ### Members of a forum imported from phpBB
 
-[`rustbb import phpbb`](importing.md) carries over from phpBB, for each member: the username (in Latin letters, with the original in their "About me"), the signature (as "About me"), the role, a ban in force with its reason, when they registered and last visited, an uploaded avatar, their topics and posts with their times and edits, and attached images. It does not read passwords, email addresses, IP addresses, private messages or anything else. These are stored as in the table above, and the member gets a copy or deletes them the same way once they have claimed the account.
+[`rustbb import phpbb`](importing.md) carries over from phpBB, for each member: the username (in Latin letters, with the original in their "About me"), the signature (as "About me"), the role, a ban in force with its reason, when they registered and last visited, an uploaded avatar, their topics and posts with their times and edits, attached images, their votes in polls, the members they marked as foes (as blocks), whether they took private messages, and only if the operator adds `--messages`, their private messages. It does not read passwords, email addresses, IP addresses or anything else. These are stored as in the table above, and the member gets a copy or deletes them the same way once they have claimed the account.
 
 | Data | Why | Kept until |
 | --- | --- | --- |
@@ -65,7 +65,7 @@ Administrators can ban an address or a range of addresses (Admin → Bans, or `r
 
 ### Not in the database
 
-- **Cookies:** `rustbb_session`, holding the session token, only after sign-in; and `rustbb_oauth`, for the ten minutes of a sign-in through an OpenID Connect provider or GitHub, holding a random value that ties the provider's answer to the browser. Both are needed for signing in, so they need no consent banner. There are no analytics or third-party cookies.
+- **Cookies:** `rustbb_session`, holding the session token, only after sign-in; `rustbb_oauth`, for the ten minutes of a sign-in through an OpenID Connect provider or GitHub, holding a random value that ties the provider's answer to the browser; and `rustbb_telegram`, set for half an hour by the pages that show the Telegram widget, so that a Telegram login is accepted only in a browser that was shown it. All are needed for signing in, so they need no consent banner. There are no analytics or third-party cookies.
 - **Telegram:** the login button on the sign-in page is loaded from `telegram.org`, so Telegram sees visitors of that page. The forum's bot sends messages through `api.telegram.org`: notifications (the title of the member's topic, the name of who replied and a link) and invitation requests and approvals. Telegram therefore sees them.
 - **Other sign-in providers:** a member who signs in with an OpenID Connect provider or GitHub goes through that provider's pages, so it learns that they use the forum.
 - **Memory:** to limit how often someone can sign in, register or post, the server keeps visitors' IP addresses and member ids in memory, with the times of their attempts in the last hour at most. While someone registers, the account they signed in with waits in memory for up to thirty minutes. None of this is written to disk, and it is gone at a restart.

@@ -65,4 +65,4 @@ The log says when a message could not be sent, and the [metrics](monitoring.md#m
 
 ## How sign-in is checked
 
-Telegram does not offer OpenID Connect. The widget sends a payload signed by Telegram, and RustBB checks it directly: an HMAC-SHA256 keyed with the SHA-256 of the bot token. It rejects payloads older than fifteen minutes and accepts each payload only once. The request log never records query strings, so login payloads stay out of log files.
+Telegram does not offer OpenID Connect. The widget sends a payload signed by Telegram, and RustBB checks it directly: an HMAC-SHA256 keyed with the SHA-256 of the bot token. It rejects payloads older than fifteen minutes and accepts each payload only once, whether it signs in, registers or adds the account. The callback also works only in a browser the forum has just shown the widget to, which the sign-in pages mark with a cookie: a link to a login made elsewhere signs nobody in. The request log never records query strings, so login payloads stay out of log files.

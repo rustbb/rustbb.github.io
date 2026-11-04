@@ -61,7 +61,7 @@ Every command and option, which stay as they are across 1.x ([Stability](stabili
 | `rustbb request list` | | Lists requests for an invitation |
 | `rustbb request approve <id>` | | Invites the person who asked; the bot tells them |
 | `rustbb request decline <id>` | | Declines a request |
-| `rustbb import phpbb <dump>` | `--prefix`, `--files`, `--dry-run` | Imports a phpBB forum into a new one: [Moving from phpBB](importing.md) |
+| `rustbb import phpbb <dump>` | `--prefix`, `--files`, `--messages`, `--dry-run` | Imports a phpBB forum into a new one: [Moving from phpBB](importing.md) |
 | `rustbb licenses` | | Prints the licenses of the components in the binary |
 
 Every command exits with status 0 when it succeeds and 1 when it fails.
