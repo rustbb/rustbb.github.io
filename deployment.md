@@ -45,7 +45,7 @@ Each of these sets up the same service, with the same unit and settings file; Ho
   sudo apt update && sudo apt install rustbb
   ```
 
-  The package suggests `xenia-server`, Xenia's package, as the web server in front: with [Xenia's APT repository](https://xenia-platform.github.io/apt/) added too, `sudo apt install rustbb xenia-server` sets up both. Without the repository, each release has the package as a file, covered by its signed `SHA256SUMS`: `sudo apt install ./rustbb_0.7.1_amd64.deb` (or `_arm64`). Installed that way, it upgrades from the repository once that is added.
+  The package suggests `xenia-server`, Xenia's package, as the web server in front: with [Xenia's APT repository](https://xenia-platform.github.io/apt/) added too, `sudo apt install rustbb xenia-server` sets up both. Without the repository, each release has the package as a file, covered by its signed `SHA256SUMS`: `sudo apt install ./rustbb_0.8.0_amd64.deb` (or `_arm64`). Installed that way, it upgrades from the repository once that is added.
 - **Fedora and EL9/EL10** (Rocky Linux, AlmaLinux, RHEL; x86_64, aarch64): the package `rustbb`, from the dnf repository at `https://rustbb.github.io/rpm`, so upgrades come with `dnf upgrade`:
 
   ```sh
@@ -53,7 +53,7 @@ Each of these sets up the same service, with the same unit and settings file; Ho
   sudo dnf install rustbb
   ```
 
-  dnf checks the signature of each package and of the repository's metadata. Without the repository, each release has the package as a file, covered by `SHA256SUMS`: `sudo dnf install ./rustbb-0.7.1-1.x86_64.rpm` (or `.aarch64`). Those files are not signed themselves; the repository's copies are.
+  dnf checks the signature of each package and of the repository's metadata. Without the repository, each release has the package as a file, covered by `SHA256SUMS`: `sudo dnf install ./rustbb-0.8.0-1.x86_64.rpm` (or `.aarch64`). Those files are not signed themselves; the repository's copies are.
 - **Homebrew** (macOS, and Linux), for trying RustBB out on your own computer: `brew install rustbb/tap/rustbb`, then `brew services start rustbb` runs a forum on `http://127.0.0.1:8080/`. Its settings are in `$(brew --prefix)/etc/rustbb/.env`, its database in `$(brew --prefix)/var/lib/rustbb`; restart it after changing them with `brew services restart rustbb`, and upgrade with `brew upgrade rustbb`. A forum on the internet runs on a Linux server, as above.
 
 Both repositories are signed by RustBB's OpenPGP key, `8A5C 916C 2231 973F 4D69 F84D 675A 145E BCF4 5CC2`: `gpg --show-keys /etc/apt/keyrings/rustbb.gpg` shows it, and dnf shows it before importing it. They keep the last three releases, so `apt install rustbb=VERSION` or `dnf downgrade rustbb` can go back one or two, though not past a release that migrated the database ([Going back](upgrading.md#going-back)).
@@ -82,8 +82,8 @@ pkg update -r rustbb && pkg install -y -r rustbb rustbb
 `sha256` should print `ff1acecac4db6aa020212bb93e3b540fe52b4a12bd6cb5ead18854375004b567`; if it prints anything else, remove the key and stop. Each release also has the package as a file, covered by its signed `SHA256SUMS`, for a server without the repository:
 
 ```sh
-fetch https://github.com/rustbb/releases/releases/download/v0.7.1/rustbb-0.7.1-freebsd-amd64.pkg
-pkg add ./rustbb-0.7.1-freebsd-amd64.pkg    # or -arm64
+fetch https://github.com/rustbb/releases/releases/download/v0.8.0/rustbb-0.8.0-freebsd-amd64.pkg
+pkg add ./rustbb-0.8.0-freebsd-amd64.pkg    # or -arm64
 ```
 
 The package installs the binary as `/usr/local/bin/rustbb`, the rc.d script as `/usr/local/etc/rc.d/rustbb` and the settings as `/usr/local/etc/rustbb/env`, readable by root only, which the script reads before it starts the forum. The forum runs as the user `rustbb`, which the package adds, under daemon(8), which starts it again if it stops. Unless the settings say otherwise, it listens on `127.0.0.1:8080` and keeps the database in `/var/db/rustbb/rustbb.db`; its log is `/var/log/rustbb/rustbb.log`, which newsyslog rotates daily. Like the Linux packages, it does not start the forum: set it up first, then:
@@ -95,7 +95,7 @@ service rustbb start
 
 To upgrade, `pkg upgrade` (or `pkg add` the new release's package). A running forum goes on as it was, since pkg does not let a package start services; `service rustbb restart` then runs the new version, which backs up the database before migrating it ([Upgrading](upgrading.md)). Edited settings stay. `pkg delete rustbb` stops the forum and leaves its data in `/var/db/rustbb`, and its settings if they were edited. To run the [command line](command-line.md#on-freebsd), run it as `rustbb`.
 
-The same archive without the package, `rustbb-0.7.1-freebsd-x86_64.tar.gz` (or `-arm64`), has the binary and the rc.d script as `deploy/rustbb`. For the web server in front, Xenia has a FreeBSD package too, `xenia-server`, from its [pkg repository](https://xenia-platform.github.io/pkg/).
+The same archive without the package, `rustbb-0.8.0-freebsd-x86_64.tar.gz` (or `-arm64`), has the binary and the rc.d script as `deploy/rustbb`. For the web server in front, Xenia has a FreeBSD package too, `xenia-server`, from its [pkg repository](https://xenia-platform.github.io/pkg/).
 
 ## A web server in front
 
@@ -125,6 +125,12 @@ Point the domain's DNS at the server first: Let's Encrypt checks it. Xenia's [do
 ### Caddy and Nginx
 
 [`deploy/Caddyfile`](https://github.com/rustbb/releases/blob/main/deploy/Caddyfile) does the same with Caddy, which also gets certificates by itself. [`deploy/nginx.conf`](https://github.com/rustbb/releases/blob/main/deploy/nginx.conf) is a server block for Nginx on port 80; add HTTPS with your usual certificate tool. It sets `X-Forwarded-For` to the address Nginx saw, never to what the client sent.
+
+### Live updates
+
+Each open page with JavaScript keeps one connection to `/live`, a stream of server-sent events: a topic's last page hears of new replies, and a member's pages of the header's counts. RustBB sends something every 25 seconds and marks the stream `X-Accel-Buffering: no` and `Cache-Control: no-transform`, so Xenia, Caddy and Nginx pass it on as it comes, without buffering or compressing it. A web server that ends a quiet response sooner than that, or buffers it whatever it says, only stops pages updating: they work as before, and show the news when they are loaded again.
+
+`RUSTBB_LIVE_MAX_CONNECTIONS` (1,000 unless set) is how many pages RustBB keeps up to date at once, and one visitor, by address (an IPv6 address by its /64), holds at most 20. Past either, pages simply do not update. Each costs little memory and no database work until something happens; `rustbb_live_connections` in the [metrics](monitoring.md#metrics) shows how many are open. `0` turns live updates off.
 
 ## Feeds and search engines
 

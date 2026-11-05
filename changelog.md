@@ -6,6 +6,46 @@ rolled back without the backup taken before the upgrade.
 
 A release tag `vX.Y.Z` needs a `## X.Y.Z` section here.
 
+## 0.8.0
+
+Pages that keep themselves up to date, and an importer for SMF forums,
+windows-1251 boards included.
+
+No database migration.
+
+Live updates:
+
+- Open pages keep themselves up to date, in browsers with JavaScript. On
+  a topic's last page, replies posted since it opened show as a button
+  under the posts, "2 new replies: show them", which adds them to the
+  page; nothing moves before it is pressed, and screen readers announce
+  the count. The header's counts of unread messages and open reports
+  change as they do. Without JavaScript pages work as before.
+- Each open page holds one connection to `/live`. At most
+  `RUSTBB_LIVE_MAX_CONNECTIONS` (1,000 unless set; `0` turns live updates
+  off) are open at once, and 20 per visitor; past either, pages simply do
+  not update. `rustbb_live_connections` in the metrics counts them.
+- Web servers in front need nothing new: the stream asks Nginx not to
+  buffer it and Xenia not to compress it. See [Live
+  updates](deployment.md#live-updates).
+
+Importing SMF:
+
+- `rustbb import smf` brings an SMF 2.0 or 2.1 forum into a new one, as
+  `rustbb import phpbb` does for phpBB: members (who claim their accounts
+  with codes), boards and their permissions, moderators, topics and posts
+  in Markdown, edits, polls, attached images and avatars, ignore lists as
+  blocks, and with `--messages` private messages. Unapproved posts and the
+  recycle bin stay behind.
+- Boards in windows-1251, as Russian SMF boards before 2.1 were, come over
+  whether the dump kept the bytes (`--default-character-set=latin1`) or
+  turned them into UTF-8; `--charset` names another character set. A dry
+  run shows a few names and titles, and warns about text that still looks
+  garbled.
+- SMF's old links redirect: `/index.php?topic=12.0`, `?msg=34`,
+  `?board=3.0`, profiles, attachments, and `/index.php/topic,12.0.html`.
+  [Moving from SMF](importing.md#moving-from-smf) has the details.
+
 ## 0.7.1
 
 Fixes security issues found by an internal review of 0.7.0: upgrade.

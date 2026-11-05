@@ -60,6 +60,7 @@ These addresses keep working, for links, bookmarks, feed readers, search engines
 | `/auth/oauth/{key}/callback` | The redirect address registered with an OpenID Connect provider or GitHub ([Sign-in](sign-in.md#sign-in)) |
 | `/static/style.css` | RustBB's stylesheet |
 | `/index.php`, `/viewforum.php`, `/viewtopic.php`, `/memberlist.php`, `/download/file.php` | phpBB's addresses, which redirect to the same forum, topic, post, member or image on a forum [imported from phpBB](importing.md#old-links) |
+| `/index.php/{*rest}` | With `/index.php`, SMF's addresses, such as `/index.php?topic=12.0`, `?topic=12.msg34`, `?board=5.0`, `?action=profile;u=7` and `/index.php/topic,12.0.html`, which redirect the same way on a forum [imported from SMF](importing.md#smfs-old-links) |
 
 Lists of forums, topics and search results take the page number in `page`, such as `/f/2?page=3`.
 
@@ -106,6 +107,7 @@ A custom stylesheet may use these classes. Each keeps its meaning across 1.x.
 | `react` | The full choice of reactions behind the "React" button |
 | `poll` | A topic's poll, above its posts |
 | `poll-results` | A poll's counts, one option a row |
+| `live-replies` | Under a topic's posts, the button that shows replies posted since the page opened |
 | `option` | An option's text in a poll's counts |
 | `count` | An option's votes and share in a poll's counts |
 | `poll-change` | The "Change my vote" choice, once a member has voted |

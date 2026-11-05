@@ -48,16 +48,18 @@ RustBB never receives a password. It receives an email address only from an Open
 
 A declined request is kept so that the same Telegram account cannot ask again.
 
-### Members of a forum imported from phpBB
+### Members of a forum imported from phpBB or SMF
 
 [`rustbb import phpbb`](importing.md) carries over from phpBB, for each member: the username (in Latin letters, with the original in their "About me"), the signature (as "About me"), the role, a ban in force with its reason, when they registered and last visited, an uploaded avatar, their topics and posts with their times and edits, attached images, their votes in polls, the members they marked as foes (as blocks), whether they took private messages, and only if the operator adds `--messages`, their private messages. It does not read passwords, email addresses, IP addresses or anything else. These are stored as in the table above, and the member gets a copy or deletes them the same way once they have claimed the account.
+
+[`rustbb import smf`](importing.md#moving-from-smf) carries over the same from SMF: the display name in place of the username, the members they ignored (as blocks) in place of foes, and whether they took private messages from everyone. It reads no passwords, email addresses, IP addresses, birthdates, locations or other profile fields.
 
 | Data | Why | Kept until |
 | --- | --- | --- |
 | A claim code for an imported account: who made it, when, and when it expires | The member taking over the account | It is used, replaced by a new one, or the account is deleted; an expired one stays until then, unusable |
-| Which phpBB member number and attachment number became which account and image | Redirecting phpBB's old links | Kept with the forum's records |
+| Which phpBB or SMF member number and attachment number became which account and image | Redirecting the old forum's links | Kept with the forum's records |
 
-Posts by phpBB's guests keep the name the guest gave, and belong to an account called `guest`.
+Posts by the old forum's guests keep the name the guest gave, and belong to an account called `guest`.
 
 ### Banned addresses
 
@@ -68,7 +70,7 @@ Administrators can ban an address or a range of addresses (Admin → Bans, or `r
 - **Cookies:** `rustbb_session`, holding the session token, only after sign-in; `rustbb_oauth`, for the ten minutes of a sign-in through an OpenID Connect provider or GitHub, holding a random value that ties the provider's answer to the browser; and `rustbb_telegram`, set for half an hour by the pages that show the Telegram widget, so that a Telegram login is accepted only in a browser that was shown it. All are needed for signing in, so they need no consent banner. There are no analytics or third-party cookies.
 - **Telegram:** the login button on the sign-in page is loaded from `telegram.org`, so Telegram sees visitors of that page. The forum's bot sends messages through `api.telegram.org`: notifications (the title of the member's topic, the name of who replied and a link) and invitation requests and approvals. Telegram therefore sees them.
 - **Other sign-in providers:** a member who signs in with an OpenID Connect provider or GitHub goes through that provider's pages, so it learns that they use the forum.
-- **Memory:** to limit how often someone can sign in, register or post, the server keeps visitors' IP addresses and member ids in memory, with the times of their attempts in the last hour at most. While someone registers, the account they signed in with waits in memory for up to thirty minutes. None of this is written to disk, and it is gone at a restart.
+- **Memory:** to limit how often someone can sign in, register or post, the server keeps visitors' IP addresses and member ids in memory, with the times of their attempts in the last hour at most. While someone registers, the account they signed in with waits in memory for up to thirty minutes. While a page is kept up to date ([live updates](deployment.md#live-updates)), the server holds the visitor's address (an IPv6 address by its /64), to limit how many pages one visitor keeps open, and forgets it when the page closes. None of this is written to disk, and it is gone at a restart.
 - **Logs:** each request's method and path, never its query string; and events such as a new registration (account id, username, role and the provider), a sign-in method added, or an invitation request (Telegram id). Where the logs go and how long they are kept is the operator's choice: [Monitoring](monitoring.md#logs).
 - **Metrics,** when enabled, contain counts only, nothing about a person: [Monitoring](monitoring.md#metrics).
 

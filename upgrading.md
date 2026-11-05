@@ -10,7 +10,7 @@ An upgrade replaces the binary or the image; the database stays where it is. Mig
 
 ## The automatic backup
 
-When a new version finds migrations to apply, it first writes a copy of the database next to it, named after the version and the time, such as `rustbb-before-0.7.1-20261104T120000Z.db` in `/var/lib/rustbb/`. If the copy cannot be written, nothing is migrated and the forum does not start. The log says where the copy went.
+When a new version finds migrations to apply, it first writes a copy of the database next to it, named after the version and the time, such as `rustbb-before-0.8.0-20261105T120000Z.db` in `/var/lib/rustbb/`. If the copy cannot be written, nothing is migrated and the forum does not start. The log says where the copy went.
 
 These copies are not removed by RustBB. Keep the newest until the new version has run for a while, and delete older ones when you no longer need them. Your own regular backups ([Deployment](deployment.md#backups)) are separate.
 
@@ -33,7 +33,7 @@ If you pinned `api.telegram.org` to an IPv4 address in `/etc/hosts` because 0.4 
 ## With Docker
 
 ```sh
-docker pull ofkindness/rustbb:0.7.1
+docker pull ofkindness/rustbb:0.8.0
 docker rm -f rustbb
 docker run -d --name rustbb ...    # as before, with the new tag
 ```
@@ -58,7 +58,7 @@ sha256sum -c --ignore-missing SHA256SUMS    # shasum -a 256 -c on macOS
 The image is signed the same way, and carries its software bill of materials (CycloneDX) as a signed attestation:
 
 ```sh
-cosign verify ofkindness/rustbb:0.7.1 \
+cosign verify ofkindness/rustbb:0.8.0 \
     --certificate-identity https://github.com/rustbb/rustbb/.github/workflows/publish.yml@refs/heads/main \
     --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```

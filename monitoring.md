@@ -22,7 +22,7 @@ The metrics need no password, so keep the address private: `127.0.0.1` when Prom
 
 ```sh
 docker run -d -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 \
-  -e RUSTBB_METRICS_BIND=0.0.0.0:9090 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.7.1
+  -e RUSTBB_METRICS_BIND=0.0.0.0:9090 -v rustbb:/var/lib/rustbb --env-file env ofkindness/rustbb:0.8.0
 ```
 
 | Metric | Type | Meaning |
@@ -34,6 +34,7 @@ docker run -d -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 \
 | `rustbb_start_time_seconds` | gauge | When the server started, in Unix seconds |
 | `rustbb_build_info` | gauge | Always 1, with the `version` and `commit` as labels |
 | `rustbb_db_connections` | gauge | Open database connections |
+| `rustbb_live_connections` | gauge | Pages open now that RustBB keeps up to date ([Live updates](deployment.md#live-updates)) |
 | `rustbb_db_size_bytes` | gauge | The database file and its write-ahead log |
 | `rustbb_users`, `rustbb_topics`, `rustbb_posts` | gauge | Accounts, topics and posts that are not deleted |
 | `rustbb_sessions` | gauge | Sign-ins that have not expired |

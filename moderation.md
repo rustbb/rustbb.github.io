@@ -60,6 +60,10 @@ Members who may reply in the forum vote, the poll's author too; voting stops whe
 
 Until someone votes, the poll's author and the forum's moderators can change it, or delete it; its author only while the topic is not locked, as with their posts, and they cannot delete a topic whose poll has others' votes. After that it stays as it is: its author (in a topic that is not locked) and the moderators can close it early, and only moderators can delete it. The log records what moderators do to other members' polls.
 
+## Live updates
+
+Pages keep themselves up to date while they are open, in browsers with JavaScript. On a topic's last page, replies posted since it opened show as a button under the posts, **2 new replies: show them**, which adds them to the page; nothing moves until it is pressed, and screen readers announce the count. The header's counts of unread messages and open reports change as they do. Without JavaScript, or with [live updates](deployment.md#live-updates) off, loading a page again shows the same.
+
 ## Private messages
 
 Members write to each other in private conversations, one for each pair of members: with **Send a message** on someone's profile, **New message** under **Messages** in the header, or in a conversation they have. The header shows **Messages (N new)** while conversations have unread messages. Messages use the same Markdown as posts, without images, and mentions in them notify nobody.

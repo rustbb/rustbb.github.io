@@ -1,6 +1,6 @@
-# Moving from phpBB
+# Moving from phpBB or SMF
 
-`rustbb import phpbb` brings a phpBB 3.2 or 3.3 forum into a new RustBB forum: its members, categories and forums, topics, posts, polls and attached images, and if you ask for them, private messages. Forums, topics and posts keep their numbers, so phpBB's old links lead to the same pages. Members get their accounts back with a claim code, because RustBB has no passwords.
+`rustbb import phpbb` brings a phpBB 3.2 or 3.3 forum into a new RustBB forum: its members, categories and forums, topics, posts, polls and attached images, and if you ask for them, private messages. Forums, topics and posts keep their numbers, so phpBB's old links lead to the same pages. Members get their accounts back with a claim code, because RustBB has no passwords. `rustbb import smf` does the same for SMF 2.0 and 2.1: see [Moving from SMF](#moving-from-smf).
 
 ## What comes over
 
@@ -102,3 +102,67 @@ These phpBB addresses redirect to the same pages, permanently, so that search en
 | `/index.php` | the front page |
 
 If phpBB was at the same address as the new forum, nothing else is needed. If it was in a directory, such as `https://example.com/forum/`, have the web server pass that directory's addresses to RustBB without the directory; with Caddy, `handle_path /forum/* { reverse_proxy 127.0.0.1:8080 }`, and with Nginx, `location /forum/ { proxy_pass http://127.0.0.1:8080/; }`. On another domain, redirect the old domain's addresses to the new one, path and query string included.
+
+## Moving from SMF
+
+`rustbb import smf` brings a Simple Machines Forum 2.0 or 2.1 into a new RustBB forum, as `rustbb import phpbb` does for phpBB, boards in windows-1251 included. Trying it, importing and claiming accounts go as above: [Try it](#2-try-it), [Import](#3-import) and [Members claim their accounts](#4-members-claim-their-accounts), with `smf` in place of `phpbb`.
+
+### What comes over from SMF
+
+| From SMF | In RustBB |
+| --- | --- |
+| Members who are activated, or posted at least once | Accounts, named after their display name (written in Latin letters when RustBB cannot take it, as for phpBB). The Administrator group, as the main or an additional group, makes administrators; Global Moderator, moderators. |
+| Signatures, uploaded avatars | "About me", avatars |
+| Bans of accounts, in full ("cannot access the forum"), that are in force | Bans, with their reason and end |
+| Categories and boards | Categories and forums, in the same order. A child board is named after its parents ("News › Archive"). Redirect boards and the recycle bin are left out, topics in it too. |
+| Who may see each board, and what members may do in its permission profile | Read by visitors (Guests may see it), by members only (Regular members may), or by staff only; post topics ("Post new topics"), only reply ("Post replies to any topic"), or neither |
+| Board moderators, and 2.1's moderator groups | Moderators of those forums |
+| Topics: sticky, locked | Topics: pinned, locked. A topic's title is its first post's subject; other posts' subjects ("Re: …") are dropped. |
+| Posts, with their BBCode | Posts in Markdown, as for phpBB. SMF's default smileys become emoji in posts that had smileys on. Tags SMF does not know, such as those mods add (`[spoiler]`), and tags never closed stay as they were typed. |
+| Edits | The time of the last edit and who made it |
+| Posts by guests and by deleted members | Posts by the `guest` account, each starting with the name the guest gave |
+| Attached images, in every attachment directory | Images attached to the posts |
+| Polls | Polls, as for phpBB; a poll whose voting was locked closes at its topic's last post, and one with fewer than two options is left out |
+| Private messages, only with `--messages` | Conversations, as for phpBB |
+| Ignore lists | Blocks. A member who ignored everyone, or (2.1) took messages only from buddies or administrators, has private messages turned off. |
+
+Left out, besides what phpBB leaves out: unapproved topics and posts, the recycle bin, karma and likes, buddy lists, and SMF 1.1's boards, whose tables differ (ask if you need them).
+
+### Character sets
+
+SMF before 2.1 stored text in the language's character set: a Russian board installed with the `russian` language (not `russian-utf8`) is in windows-1251, usually in tables MySQL calls `latin1`. RustBB reads such a board however it was dumped:
+
+- `mysqldump --default-character-set=latin1` keeps the bytes as they are, which is the cleanest dump of such tables;
+- `--default-character-set=utf8mb4` turns each byte into a character, so the dump shows `Ïðèâåò` where SMF showed `Привет`: RustBB turns it back.
+
+A board in UTF-8 (every 2.1 board, and 2.0 boards installed with UTF-8) needs nothing special. SMF 2.0 says nothing about its character set unless it is UTF-8, so RustBB takes text that is not UTF-8 for windows-1251; for a Western board in windows-1252 (ISO-8859-1), add `--charset windows-1252`. A dry run says which it used, shows a few names and titles, and warns when text still looks garbled:
+
+```text
+text read as windows-1251; for example: Иван Петров, Мария, Olga, Новости, Привет, мир
+3 unapproved posts and 12 topics in the recycle bin left out
+```
+
+### Exporting SMF
+
+```sh
+mysqldump --default-character-set=latin1 --single-transaction smf > smf.sql     # SMF 2.0 in windows-1251
+mysqldump --default-character-set=utf8mb4 --single-transaction smf > smf.sql    # a board in UTF-8
+```
+
+Copy SMF's `attachments` directory too, with any others **Admin → Configuration → Attachments** lists, and `custom_avatar` if avatars were kept there; give SMF's directory with `--files`. RustBB looks for each directory where SMF had it, then under `--files` by its name.
+
+### SMF's old links
+
+SMF's addresses go through `/index.php`, which RustBB answers for both forums. They redirect permanently:
+
+| SMF | RustBB |
+| --- | --- |
+| `/index.php?topic=12.0`, `?topic=12.40` | `/t/12` |
+| `/index.php?topic=12.msg345#msg345`, `?msg=345` | `/p/345` |
+| `/index.php?board=3.0` | `/f/3` |
+| `/index.php?action=profile;u=7` | the member's profile |
+| `/index.php?action=dlattach;topic=12.0;attach=9` | the attached image |
+| `/index.php/topic,12.0.html`, `/index.php/board,3.0.html` | the same, from SMF's search-engine-friendly addresses |
+| anything else on `/index.php` | the front page |
+
+As for phpBB, have the web server pass SMF's old directory, or its old domain, to RustBB.

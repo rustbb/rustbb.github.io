@@ -27,6 +27,7 @@ rustbb request approve <id>          # invites them; the bot tells them
 rustbb request decline <id>
 rustbb backup /path/to/copy.db       # a consistent copy while the forum runs, as it is
 rustbb import phpbb phpbb.sql --files /var/www/phpbb   # a phpBB forum, into a new one
+rustbb import smf smf.sql --files /var/www/smf         # an SMF forum, into a new one
 rustbb licenses                      # licenses of the components in the binary
 rustbb --version                     # version, commit and build date
 rustbb help <command>
@@ -62,6 +63,7 @@ Every command and option, which stay as they are across 1.x ([Stability](stabili
 | `rustbb request approve <id>` | | Invites the person who asked; the bot tells them |
 | `rustbb request decline <id>` | | Declines a request |
 | `rustbb import phpbb <dump>` | `--prefix`, `--files`, `--messages`, `--dry-run` | Imports a phpBB forum into a new one: [Moving from phpBB](importing.md) |
+| `rustbb import smf <dump>` | `--prefix`, `--files`, `--messages`, `--charset`, `--dry-run` | Imports an SMF forum into a new one: [Moving from SMF](importing.md#moving-from-smf) |
 | `rustbb licenses` | | Prints the licenses of the components in the binary |
 
 Every command exits with status 0 when it succeeds and 1 when it fails.

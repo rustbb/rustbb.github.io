@@ -25,6 +25,7 @@ An empty value counts as unset. Settings are read when the server starts: restar
 | `RUSTBB_DATABASE_PATH` | `rustbb.db` | The SQLite database; created if missing |
 | `RUSTBB_UPLOADS_PATH` | `uploads` next to the database | Where avatars and images attached to posts are stored; created at the first upload. Back it up with the database ([Deployment](deployment.md#backups)) |
 | `RUSTBB_UPLOAD_MAX_MB` | `5` | The largest image a member may upload, in megabytes; `0` turns avatars and attachments off |
+| `RUSTBB_LIVE_MAX_CONNECTIONS` | `1000` | Open pages that RustBB keeps up to date at once, such as a topic's new replies; `0` turns live updates off. See [Live updates](deployment.md#live-updates) |
 
 The systemd unit sets `RUSTBB_BIND` and `RUSTBB_DATABASE_PATH` itself (`127.0.0.1:8080` and `/var/lib/rustbb/rustbb.db`), and so does the image (`0.0.0.0:8080`, same database). Leave them out of the environment file: a value there overrides theirs.
 
